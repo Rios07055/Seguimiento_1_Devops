@@ -9,7 +9,7 @@ def get(db: Session, item_id: int):
     return db.query(models.Facultad).filter(models.Facultad.id == item_id).first()
 
 def create(db: Session, item: schemas.FacultadCreate):
-    db_item = models.Facultad(**item.dict())
+    db_item = models.Facultad(**item.model_dump())
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -19,7 +19,7 @@ def update(db: Session, item_id: int, item: schemas.FacultadUpdate):
     db_item = get(db, item_id)
     if not db_item:
         return None
-    for k, v in item.dict(exclude_unset=True).items():
+    for k, v in item.model_dump(exclude_unset=True).items():
         setattr(db_item, k, v)
     db.add(db_item)
     db.commit()
