@@ -10,7 +10,7 @@ def get(db: Session, item_id: int):
     return db.query(models.Carrera).filter(models.Carrera.id == item_id).first()
 
 def create(db: Session, item: schemas.CarreraCreate):
-    db_item = models.Carrera(**item.dict())
+    db_item = models.Carrera(**item.model_dump())
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -20,7 +20,7 @@ def update(db: Session, item_id: int, item: schemas.CarreraUpdate):
     db_item = get(db, item_id)
     if not db_item:
         return None
-    for k, v in item.dict(exclude_unset=True).items():
+    for k, v in item.model_dump(exclude_unset=True).items():
         setattr(db_item, k, v)
     db.add(db_item)
     db.commit()

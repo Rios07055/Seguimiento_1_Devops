@@ -9,7 +9,7 @@ def get(db: Session, item_id: int):
     return db.query(models.Estudiante).filter(models.Estudiante.id == item_id).first()
 
 def create(db: Session, item: schemas.EstudianteCreate):
-    db_item = models.Estudiante(**item.dict())
+    db_item = models.Estudiante(**item.model_dump())
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -19,7 +19,7 @@ def update(db: Session, item_id: int, item: schemas.EstudianteUpdate):
     db_item = get(db, item_id)
     if not db_item:
         return None
-    for k, v in item.dict(exclude_unset=True).items():
+    for k, v in item.model_dump(exclude_unset=True).items():
         setattr(db_item, k, v)
     db.add(db_item)
     db.commit()
