@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
-from database import Base
+from .database import Base
 
 class Facultad(Base):
     __tablename__ = "facultad"
