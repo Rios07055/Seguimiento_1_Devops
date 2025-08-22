@@ -1,7 +1,5 @@
+from . import models, schemas
 from sqlalchemy.orm import Session
-import models
-import schemas
-
 
 def get_all(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Carrera).offset(skip).limit(limit).all()
