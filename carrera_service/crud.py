@@ -5,7 +5,8 @@ def get_all(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Carrera).offset(skip).limit(limit).all()
 
 def get(db: Session, item_id: int):
-    return db.query(models.Carrera).filter(models.Carrera.id == item_id).first()
+    return db.query(models.Carrera).filter_by(id=item_id).first()
+
 
 def create(db: Session, item: schemas.CarreraCreate):
     db_item = models.Carrera(**item.model_dump())

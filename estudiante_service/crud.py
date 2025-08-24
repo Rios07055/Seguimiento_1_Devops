@@ -5,7 +5,7 @@ def get_all(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Estudiante).offset(skip).limit(limit).all()
 
 def get(db: Session, item_id: int):
-    return db.query(models.Estudiante).filter(models.Estudiante.id == item_id).first()
+    return db.query(models.Estudiante).filter_by(id=item_id).first()
 
 def create(db: Session, item: schemas.EstudianteCreate):
     db_item = models.Estudiante(**item.model_dump())

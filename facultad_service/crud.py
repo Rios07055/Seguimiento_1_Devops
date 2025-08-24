@@ -5,7 +5,8 @@ def get_all(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Facultad).offset(skip).limit(limit).all()
 
 def get(db: Session, item_id: int):
-    return db.query(models.Facultad).filter(models.Facultad.id == item_id).first()
+    return db.query(models.Facultad).filter_by(id=item_id).first()
+
 
 def create(db: Session, item: schemas.FacultadCreate):
     db_item = models.Facultad(**item.model_dump())
