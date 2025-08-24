@@ -1,4 +1,3 @@
-# estudiante_service/tests/conftest.py
 import os
 import importlib
 import pytest
