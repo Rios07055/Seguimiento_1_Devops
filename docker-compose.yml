@@ -1,0 +1,73 @@
+version: "3.9"
+
+services:
+  mariadb:
+    image: mariadb:${MARIADB_IMAGE_TAG:-12.0.2}
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-universidad}
+      MYSQL_USER: ${MYSQL_USER:-fastapi}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-1234}
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "${MARIADB_HOST_PORT:-13306}:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -u\"${MYSQL_USER:-fastapi}\" -p\"${MYSQL_PASSWORD:-1234}\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  estudiante:
+    build:
+      context: .
+      dockerfile: estudiante_service/Dockerfile
+    env_file:
+      - .env
+      - ./estudiante_service/.env
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    ports:
+      - "${ESTUDIANTE_PORT:-8011}:8000"
+    restart: unless-stopped
+
+  carrera:
+    build:
+      context: .
+      dockerfile: carrera_service/Dockerfile
+    env_file:
+      - .env
+      - ./carrera_service/.env
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    ports:
+      - "${CARRERA_PORT:-8012}:8000"
+    restart: unless-stopped
+
+  facultad:
+    build:
+      context: .
+      dockerfile: facultad_service/Dockerfile
+    env_file:
+      - .env
+      - ./facultad_service/.env
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    ports:
+      - "${FACULTAD_PORT:-8013}:8000"
+    restart: unless-stopped
+
+volumes:
+  mariadb_data:
