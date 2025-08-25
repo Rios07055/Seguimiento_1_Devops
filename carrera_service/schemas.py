@@ -1,21 +1,19 @@
-from pydantic import BaseModel
+from typing import Optional
+from pydantic import BaseModel, ConfigDict
 
 class CarreraBase(BaseModel):
     nombre: str
-    facultad_id: int
+    facultad_id: Optional[int] = None  # ahora opcional
 
 class CarreraCreate(CarreraBase):
     pass
 
 class CarreraUpdate(BaseModel):
-    nombre: str | None = None
-    facultad_id: int | None = None
-
+    nombre: Optional[str] = None
+    facultad_id: Optional[int] = None
 
 class CarreraRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     nombre: str
-    facultad_id: int
-
-class Config:
-    orm_mode = True
+    facultad_id: Optional[int] = None
