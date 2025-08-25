@@ -24,3 +24,4 @@ def test_update_and_delete(setup_db):
     assert deleted.id == created.id
     assert crud.get(db, created.id) is None
     db.close()
+
