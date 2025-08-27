@@ -47,8 +47,8 @@ services:
     envVars:
       # Tras el primer deploy, pega aquí las URLs reales que Render te dé
       - key: ESTUDIANTES_URL
-        value: https://estudiante.onrender.com
+        value: https://estudiante-kib6.onrender.com
       - key: CARRERAS_URL
-        value: https://carrera.onrender.com
+        value: https://carrera-ello.onrender.com
       - key: FACULTADES_URL
-        value: https://facultad.onrender.com
+        value: https://facultad-n4qi.onrender.com
