@@ -18,53 +18,21 @@ jobs:
       group: automerge-testing
       cancel-in-progress: false
 
-    steps:
-      - name: Checkout (full)
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: universidad
+          MARIADB_USER: fastapi
+          MARIADB_PASSWORD: 1234
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s --health-timeout=5s --health-retries=10
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install deps & run tests with coverage
-        run: |
-          pip install -r requirements.txt || true
-          pip install pytest pytest-cov
-          pytest -q --maxfail=1 --disable-warnings --cov=. --cov-report=xml
-
-      - name: Read coverage.xml → pct
-        id: covcalc
-        run: |
-          python - <<'PY'
-          import xml.etree.ElementTree as ET
-          root = ET.parse('coverage.xml').getroot()
-          pct = round(float(root.get('line-rate', '0'))*100, 2)
-          print("coverage %:", pct)
-          open("${GITHUB_OUTPUT}","a").write(f"pct={pct}\n")
-          PY
-
-      - name: Merge ${{ github.ref_name }} → testing
-        if: ${{ fromJSON(steps.covcalc.outputs.pct) > 60 }}
-        run: |
-          SRC="${GITHUB_REF_NAME}"
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin
-          git checkout -B testing origin/testing || git checkout -b testing
-          git fetch origin "${SRC}:${SRC}" || true
-          git merge --no-ff --no-edit "origin/${SRC}"
-          git push origin testing
-
-      - name: Deploy to Vercel (Preview)
-        if: ${{ fromJSON(steps.covcalc.outputs.pct) > 60 }}
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: .
-          vercel-args: ''
-          prod: false
+    env:
+      DATABASE_URL: mysql+pymysql://fastapi:1234@127.0.0.1:3306/universidad
+      PYTHONDONTWRITEBYTECODE: 1
+      PYTHONUNBUFFERED: 1
