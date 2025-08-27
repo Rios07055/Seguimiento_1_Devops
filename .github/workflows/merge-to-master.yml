@@ -1,0 +1,66 @@
+name: testing → master (85%+)
+
+on:
+  push:
+    branches: [testing]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  ci-merge-master:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: automerge-master
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout (full)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps & run tests with coverage
+        run: |
+          pip install -r requirements.txt || true
+          pip install pytest pytest-cov
+          pytest -q --maxfail=1 --disable-warnings --cov=. --cov-report=xml
+
+      - name: Read coverage.xml → pct
+        id: covcalc
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('coverage.xml').getroot()
+          pct = round(float(root.get('line-rate', '0'))*100, 2)
+          print("coverage %:", pct)
+          open("${GITHUB_OUTPUT}","a").write(f"pct={pct}\n")
+          PY
+
+      - name: Merge testing → master (no-ff)
+        if: ${{ fromJSON(steps.covcalc.outputs.pct) >= 85 }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+          git checkout master
+          git merge --no-ff --no-edit origin/testing
+          git push origin master
+
+      - name: Deploy to Vercel (Production)
+        if: ${{ fromJSON(steps.covcalc.outputs.pct) >= 85 }}
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: .
+          vercel-args: ''
+          prod: true
