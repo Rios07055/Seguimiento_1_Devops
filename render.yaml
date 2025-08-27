@@ -1,4 +1,3 @@
-# render.yaml
 services:
   - type: web
     name: estudiante
@@ -36,16 +35,14 @@ services:
       - key: DATABASE_URL
         value: postgresql+psycopg://universidad_xxe6_user:cBuBRdbD9FdUXR8XWmEJwsIlVRflzjso@dpg-d2nmglumcj7s73cp3vgg-a.oregon-postgres.render.com:5432/universidad_xxe6?sslmode=require
 
-  # Gateway público (Nginx)
   - type: web
     name: gateway
     env: docker
     plan: free
-    rootDir: gateway
+    rootDir: .
     dockerfilePath: gateway/Dockerfile
     autoDeploy: true
     envVars:
-      # Tras el primer deploy, pega aquí las URLs reales que Render te dé
       - key: ESTUDIANTES_URL
         value: https://estudiante-kib6.onrender.com
       - key: CARRERAS_URL
