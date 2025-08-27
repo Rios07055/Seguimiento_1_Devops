@@ -4,7 +4,13 @@ from sqlalchemy.orm import Session
 from . import schemas, crud
 from .database import engine, Base, get_db
 
-app = FastAPI(title="Estudiante service")
+app = FastAPI(
+    title="estudiante",
+    docs_url="/estudiantes/docs",
+    redoc_url="/estudiantes/redoc",
+    openapi_url="/estudiantes/openapi.json",
+)
+
 
 Base.metadata.create_all(bind=engine)
 

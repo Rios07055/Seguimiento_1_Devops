@@ -1,0 +1,66 @@
+# render.yaml
+services:
+  - type: web
+    name: estudiante
+    env: docker
+    plan: free
+    rootDir: .
+    dockerfilePath: estudiante_service/Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pg-universidad
+          property: connectionString
+
+  - type: web
+    name: carrera
+    env: docker
+    plan: free
+    rootDir: .
+    dockerfilePath: carrera_service/Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pg-universidad
+          property: connectionString
+
+  - type: web
+    name: facultad
+    env: docker
+    plan: free
+    rootDir: .
+    dockerfilePath: facultad_service/Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pg-universidad
+          property: connectionString
+
+  # Gateway público (Nginx)
+  - type: web
+    name: gateway
+    env: docker
+    plan: free
+    rootDir: gateway
+    dockerfilePath: gateway/Dockerfile
+    autoDeploy: true
+    envVars:
+      # Tras el primer deploy, pega aquí las URLs públicas de los 3 servicios (https)
+      - key: ESTUDIANTES_URL
+        value: https://estudiante.onrender.com
+      - key: CARRERAS_URL
+        value: https://carrera.onrender.com
+      - key: FACULTADES_URL
+        value: https://facultad.onrender.com
+
+databases:
+  - name: pg-universidad
+    plan: free
+    databaseName: universidad
+    user: fastapi

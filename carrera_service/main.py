@@ -4,7 +4,12 @@ from sqlalchemy.orm import Session
 from . import schemas, crud
 from .database import engine, Base, get_db
 
-app = FastAPI(title="Carrera service")
+app = FastAPI(
+    title="carrera",
+    docs_url="/carreras/docs",
+    redoc_url="/carreras/redoc",
+    openapi_url="/carreras/openapi.json",
+)
 
 Base.metadata.create_all(bind=engine)
 

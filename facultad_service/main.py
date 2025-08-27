@@ -3,7 +3,13 @@ from sqlalchemy.orm import Session
 from . import schemas, crud
 from .database import engine, Base, get_db
 
-app = FastAPI(title="Facultad service")
+app = FastAPI(
+    title="facultad",
+    docs_url="/facultades/docs",
+    redoc_url="/facultades/redoc",
+    openapi_url="/facultades/openapi.json",
+)
+
 
 Base.metadata.create_all(bind=engine)
 
