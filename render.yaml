@@ -10,9 +10,7 @@ services:
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: pg-universidad
-          property: connectionString
+        value: postgresql+psycopg://universidad_xxe6_user:cBuBRdbD9FdUXR8XWmEJwsIlVRflzjso@dpg-d2nmglumcj7s73cp3vgg-a.oregon-postgres.render.com:5432/universidad_xxe6?sslmode=require
 
   - type: web
     name: carrera
@@ -24,9 +22,7 @@ services:
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: pg-universidad
-          property: connectionString
+        value: postgresql+psycopg://universidad_xxe6_user:cBuBRdbD9FdUXR8XWmEJwsIlVRflzjso@dpg-d2nmglumcj7s73cp3vgg-a.oregon-postgres.render.com:5432/universidad_xxe6?sslmode=require
 
   - type: web
     name: facultad
@@ -38,9 +34,7 @@ services:
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: pg-universidad
-          property: connectionString
+        value: postgresql+psycopg://universidad_xxe6_user:cBuBRdbD9FdUXR8XWmEJwsIlVRflzjso@dpg-d2nmglumcj7s73cp3vgg-a.oregon-postgres.render.com:5432/universidad_xxe6?sslmode=require
 
   # Gateway público (Nginx)
   - type: web
@@ -51,16 +45,10 @@ services:
     dockerfilePath: gateway/Dockerfile
     autoDeploy: true
     envVars:
-      # Tras el primer deploy, pega aquí las URLs públicas de los 3 servicios (https)
+      # Tras el primer deploy, pega aquí las URLs reales que Render te dé
       - key: ESTUDIANTES_URL
         value: https://estudiante.onrender.com
       - key: CARRERAS_URL
         value: https://carrera.onrender.com
       - key: FACULTADES_URL
         value: https://facultad.onrender.com
-
-databases:
-  - name: pg-universidad
-    plan: free
-    databaseName: universidad
-    user: fastapi
