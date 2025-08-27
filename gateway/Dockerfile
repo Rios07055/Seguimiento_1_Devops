@@ -1,6 +1,5 @@
 FROM nginx:1.27-alpine
 
-# Copiamos el conf
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY default.conf.template /etc/nginx/templates/default.conf.template
 
 EXPOSE 8080

@@ -49,3 +49,4 @@ services:
         value: https://carrera-ello.onrender.com
       - key: FACULTADES_URL
         value: https://facultad-n4qi.onrender.com
+
