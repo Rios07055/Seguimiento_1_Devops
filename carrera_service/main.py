@@ -9,15 +9,16 @@ app = FastAPI(
     docs_url="/carreras/docs",
     redoc_url="/carreras/redoc",
     openapi_url="/carreras/openapi.json",
+    servers=[{"url": "/carreras"}],
 )
 
 Base.metadata.create_all(bind=engine)
 
-@app.get("/carreras", response_model=list[schemas.CarreraRead])
+@app.get("/carreras/", response_model=list[schemas.CarreraRead])
 def read_all(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_all(db, skip=skip, limit=limit)
 
-@app.post("/carreras", response_model=schemas.CarreraRead, status_code=201)
+@app.post("/carreras/", response_model=schemas.CarreraRead, status_code=201)
 def create_item(item: schemas.CarreraCreate, db: Session = Depends(get_db)):
     return crud.create(db, item)
 

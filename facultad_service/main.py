@@ -8,6 +8,7 @@ app = FastAPI(
     docs_url="/facultades/docs",
     redoc_url="/facultades/redoc",
     openapi_url="/facultades/openapi.json",
+    servers=[{"url": "/facultades"}],
 )
 
 
@@ -17,7 +18,7 @@ Base.metadata.create_all(bind=engine)
 def read_all(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_all(db, skip=skip, limit=limit)
 
-@app.post("/facultades", response_model=schemas.FacultadRead, status_code=201)
+@app.post("/facultades/", response_model=schemas.FacultadRead, status_code=201)
 def create_item(item: schemas.FacultadCreate, db: Session = Depends(get_db)):
     return crud.create(db, item)
 
