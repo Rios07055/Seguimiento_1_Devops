@@ -1,0 +1,98 @@
+name: CI y Deploy (master)
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  test-build-and-deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install pytest pytest-cov; fi
+
+      - name: Run tests + coverage (xml + html)
+        run: |
+          pytest --cov=./ --cov-report=xml --cov-report=html:coverage_html
+
+      - name: Upload coverage HTML report (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html-master
+          path: coverage_html
+
+      - name: Extract coverage percentage from coverage.xml
+        id: extract_cov
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET, sys, os
+          xml_path = 'coverage.xml'
+          if not os.path.exists(xml_path):
+              print("ERROR: coverage.xml not found", file=sys.stderr); sys.exit(2)
+          tree = ET.parse(xml_path)
+          root = tree.getroot()
+          line_rate = root.get('line-rate')
+          if line_rate is None:
+              for elem in root.iter():
+                  if 'line-rate' in elem.attrib:
+                      line_rate = elem.attrib.get('line-rate'); break
+          if line_rate is None:
+              print("ERROR: could not find line-rate in coverage.xml", file=sys.stderr); sys.exit(2)
+          percent = float(line_rate) * 100.0
+          print(f"Extracted coverage percent: {percent:.2f}%")
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
+              fh.write(f"percent={percent:.2f}\n")
+          PY
+
+      - name: Check coverage threshold (85% for master)
+        run: |
+          PERCENT="${{ steps.extract_cov.outputs.percent }}"
+          echo "Coverage = $PERCENT"
+          python - <<'PY'
+          import os, sys
+          p = float(os.environ.get('PERCENT','0'))
+          if p < 85.0:
+              print(f"Coverage {p:.2f}% is below 85% threshold. Failing.")
+              sys.exit(1)
+          print(f"Coverage {p:.2f}% meets threshold.")
+          PY
+
+      - name: Trigger Render deploy via hook
+        if: success()
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_MASTER }}
+        run: |
+          curl -s -X POST "${DEPLOY_HOOK_URL}"
