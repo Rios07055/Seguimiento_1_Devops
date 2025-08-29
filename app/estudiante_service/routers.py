@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from typing import Any
 
 from . import schemas, crud
 from .database import engine, Base, get_db
@@ -34,6 +35,17 @@ def update_item(item_id: int, item: schemas.EstudianteUpdate, db: Session = Depe
     if not db_item:
         raise HTTPException(status_code=404, detail="Not found")
     return db_item
+
+@router.patch("/{item_id}", response_model=schemas.EstudianteRead)
+def patch_estudiante(item_id: int, item: schemas.EstudianteUpdate, db: Session = Depends(get_db)):
+    update_data = item.dict(exclude_unset=True)
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields provided for update")
+
+    db_obj = crud.patch_estudiante(db, item_id, update_data)
+    if not db_obj:
+        raise HTTPException(status_code=404, detail="Estudiante not found")
+    return db_obj
 
 @router.delete("/{item_id}", response_model=schemas.EstudianteRead)
 def delete_item(item_id: int, db: Session = Depends(get_db)):
