@@ -43,6 +43,11 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install pytest pytest-cov; fi
 
+      - name: Add repo and app folders to PYTHONPATH
+        run: |
+          echo "PYTHONPATH=${{ github.workspace }}:${{ github.workspace }}/app" >> $GITHUB_ENV
+          echo "PYTHONPATH=${{ github.workspace }}:${{ github.workspace }}/app:${{ github.workspace }}/app/carrera_service:${{ github.workspace }}/app/estudiante_service:${{ github.workspace }}/app/facultad_service" >> $GITHUB_ENV
+
       - name: Run tests + coverage (xml + html)
         run: |
           pytest --cov=./ --cov-report=xml --cov-report=html:coverage_html
