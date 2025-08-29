@@ -1,41 +1,19 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
-from estudiante_service.main import app as estudiantes_app
-from carrera_service.main import app as carreras_app
-from facultad_service.main import app as facultades_app
+app = FastAPI(title="Universidad")
 
-app = FastAPI(
-    title="Universidad API",
-    version="1.0.0",
-    description="API unificada con sub-aplicaciones: /estudiantes, /carreras, /facultades",
-)
+from app.estudiante_service.routers import router as estudiante_router
+from app.carrera_service.routers import router as carrera_router
+from app.facultad_service.routers import router as facultad_router
 
-# (Opcional) CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.mount("/estudiantes", estudiantes_app)
-app.mount("/carreras", carreras_app)
-app.mount("/facultades", facultades_app)
+app.include_router(estudiante_router, prefix="/estudiantes")
+app.include_router(carrera_router, prefix="/carreras")
+app.include_router(facultad_router, prefix="/facultades")
 
 @app.get("/", tags=["root"])
 def root():
-    return {
-        "name": "Universidad API",
-        "endpoints": {
-            "estudiantes": "/estudiantes",
-            "carreras": "/carreras",
-            "facultades": "/facultades",
-            "docs": {
-                "estudiantes": "/estudiantes/docs",
-                "carreras": "/carreras/docs",
-                "facultades": "/facultades/docs",
-            },
-        },
-    }
+    return {"status": "ok", "services": ["/estudiantes", "/carreras", "/facultades"]}
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)
