@@ -1,0 +1,8 @@
+fastapi
+pydantic
+pytest
+sqlalchemy
+uvicorn
+pymysql
+cryptography
+psycopg[binary]==3.2.9
