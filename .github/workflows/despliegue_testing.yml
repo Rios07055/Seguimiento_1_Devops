@@ -82,9 +82,11 @@ jobs:
               fh.write(f"percent={percent:.2f}\n")
           PY
 
-      - name: Check coverage threshold (60% for testing)
+      - name: Check coverage threshold (testing)
+        id: check_threshold
+        env:
+          PERCENT: ${{ steps.extract_cov.outputs.percent }}
         run: |
-          PERCENT="${{ steps.extract_cov.outputs.percent }}"
           echo "Coverage = $PERCENT"
           python - <<'PY'
           import os, sys
