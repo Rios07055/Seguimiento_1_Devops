@@ -1,7 +1,7 @@
 from carrera_service import crud, schemas, models
 from carrera_service.database import SessionLocal
 
-"""""
+
 def test_create_and_get_carrera(setup_db):
     db = SessionLocal()
     c_in = schemas.CarreraCreate(nombre="Ing. Sistemas", facultad_id=None)
@@ -84,4 +84,3 @@ def test_delete_nonexistent_returns_none(setup_db):
     res = crud.delete(db, 999999)
     assert res is None
     db.close()
-"""
