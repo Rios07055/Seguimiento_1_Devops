@@ -1,6 +1,6 @@
 from . import models, schemas
 from sqlalchemy.orm import Session
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from sqlalchemy import inspect as sqlalchemy_inspect
 
 def _get_pk_name(model) -> str:

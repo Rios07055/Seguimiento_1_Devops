@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Any
 
 from . import schemas, crud
 from .database import engine, Base, get_db
@@ -35,7 +34,7 @@ def update_item(item_id: int, item: schemas.FacultadUpdate, db: Session = Depend
 
 @router.patch("/{item_id}", response_model=schemas.FacultadRead)
 def patch_facultad(item_id: int, item: schemas.FacultadUpdate, db: Session = Depends(get_db)):
-    update_data = item.dict(exclude_unset=True)
+    update_data = item.model_dump(exclude_unset=True)
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields provided for update")
     db_obj = crud.patch_facultad(db, item_id, update_data)

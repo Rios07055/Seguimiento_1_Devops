@@ -1,6 +1,6 @@
 from . import models, schemas
 from sqlalchemy.orm import Session
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from sqlalchemy import inspect as sqlalchemy_inspect
 
 def _get_pk_name(model) -> str:
@@ -47,7 +47,7 @@ def delete(db: Session, item_id: int):
 
 def patch_item(db: Session, model, item_id: int, obj_in: Dict[str, Any]):
     pk_name = _get_pk_name(model)
-    db_obj = db.query(model).filter(getattr(model, pk_name) == item_id).first()
+    db_obj = db.query(model).filter(model.__table__.c[pk_name] == item_id).first()
     if not db_obj:
         return None
 
