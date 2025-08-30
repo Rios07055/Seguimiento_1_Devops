@@ -5,7 +5,6 @@ from sqlalchemy.pool import StaticPool
 from dotenv import load_dotenv
 
 load_dotenv()
-
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///:memory:")
 
 if DATABASE_URL.startswith("sqlite"):
