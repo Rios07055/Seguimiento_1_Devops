@@ -80,5 +80,5 @@ def test_delete_nonexistent_returns_none(setup_db):
     db = SessionLocal()
     res = crud.delete(db, 999999)
     assert res is None
-    db.close()
+    db.close() 
 """
