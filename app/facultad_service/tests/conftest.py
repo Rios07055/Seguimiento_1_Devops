@@ -3,7 +3,6 @@ import importlib
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-"""
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 
 
@@ -22,4 +21,3 @@ def client(setup_db):
     app = FastAPI()
     app.include_router(routers.router)
     return TestClient(app)
-"""
