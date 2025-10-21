@@ -1,7 +1,5 @@
 from estudiante_service import crud, schemas, models
 from estudiante_service.database import SessionLocal
-
-"""
 def test_create_and_get_estudiante(setup_db):
     db = SessionLocal()
     est_in = schemas.EstudianteCreate(nombre="Juan", email="juan@example.com", carrera_id=None)
@@ -80,5 +78,4 @@ def test_delete_nonexistent_returns_none(setup_db):
     db = SessionLocal()
     res = crud.delete(db, 999999)
     assert res is None
-    db.close() 
-"""
+    db.close()

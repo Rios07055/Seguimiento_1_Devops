@@ -1,5 +1,5 @@
 def test_full_crud_flow(client):
-    """    # crear
+    # crear
     resp = client.post("/", json={"nombre": "Carlos", "email": "carlos@test.com", "carrera_id": None})
     assert resp.status_code == 201
     data = resp.json()
@@ -23,5 +23,3 @@ def test_full_crud_flow(client):
     # intentar obtener da 404
     r5 = client.get(f"/{item_id}")
     assert r5.status_code == 404
-
-"""
